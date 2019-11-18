@@ -1,10 +1,10 @@
-package com.example.tasm
+package com.example.worker
 
 import android.content.Context
 import androidx.work.*
-import com.example.tasm.MainActivity.Companion.CURRENT_POSITION
-import com.example.tasm.MainActivity.Companion.DEFAULT_VALUE
-import com.example.tasm.MainActivity.Companion.PROGRESS
+import com.example.worker.MainActivity.Companion.CURRENT_POSITION
+import com.example.worker.MainActivity.Companion.DEFAULT_VALUE
+import com.example.worker.MainActivity.Companion.PROGRESS
 import java.util.concurrent.TimeUnit
 
 class MyWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
