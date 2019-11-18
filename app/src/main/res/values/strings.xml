@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Worker</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="found_prime_number">Found prime number:</string>
+    <string name="play">Play</string>
+    <string name="stop">Stop</string>
+</resources>
