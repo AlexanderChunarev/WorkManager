@@ -15,6 +15,7 @@ import androidx.lifecycle.Observer
 
 class MainActivity : AppCompatActivity() {
     private var request: OneTimeWorkRequest? = null
+    private var isRunning = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,9 +30,12 @@ class MainActivity : AppCompatActivity() {
             if (savedInstanceState.containsKey(CURRENT_POSITION)) {
                 currPosition = savedInstanceState.getInt(CURRENT_POSITION)
             }
+            if (savedInstanceState.containsKey(RUNNING_STATE) && savedInstanceState.getBoolean(
+                    RUNNING_STATE)) {
+                perform()
+            }
         }
         list_of_primes.adapter = adapter
-        cancel()
     }
 
     private fun perform() {
@@ -57,6 +61,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        outState.putBoolean(RUNNING_STATE, isRunning)
         if (primeNumbers.isNotEmpty()) {
             outState.putInt(CURRENT_POSITION, primeNumbers[primeNumbers.lastIndex])
             outState.putSerializable(SAVED_LAYOUT_STATE, primeNumbers as Serializable)
@@ -72,6 +77,7 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.play_btn -> {
                 if (!isExecuting()) {
+                    isRunning = true
                     if (primeNumbers.isNotEmpty()) {
                         currPosition = primeNumbers[primeNumbers.lastIndex] + 1
                     }
@@ -81,10 +87,16 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             R.id.stop_btn -> {
+                isRunning = false
                 cancel()
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onDestroy() {
+        cancel()
+        super.onDestroy()
     }
 
     private fun isExecuting(): Boolean {
@@ -103,6 +115,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
+        const val RUNNING_STATE = "taskIsRunning"
         const val CURRENT_POSITION = "current_position"
         const val SAVED_LAYOUT_STATE = "save_layout_state"
         const val PROGRESS = "getPrimeNumber"
