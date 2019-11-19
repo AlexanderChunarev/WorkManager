@@ -12,10 +12,7 @@ import androidx.work.WorkManager
 import androidx.work.OneTimeWorkRequest
 import androidx.lifecycle.Observer
 
-
 class MainActivity : AppCompatActivity() {
-    private var request: OneTimeWorkRequest? = null
-    private var isRunning = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,5 +120,7 @@ class MainActivity : AppCompatActivity() {
         private var primeNumbers = mutableListOf<Int>()
         private var currPosition: Int = 2
         private val adapter by lazy { DataAdapter(primeNumbers) }
+        private var request: OneTimeWorkRequest? = null
+        private var isRunning = false
     }
 }
