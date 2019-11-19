@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
 
-class DataAdapter( private var primeNumbers: MutableList<Int>): Adapter<CustomViewHolder>() {
+class DataAdapter : Adapter<CustomViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         CustomViewHolder(
@@ -22,7 +22,13 @@ class DataAdapter( private var primeNumbers: MutableList<Int>): Adapter<CustomVi
     }
 
     fun addItem(number: Int) {
-        primeNumbers.add(number)
-        notifyItemInserted(primeNumbers.size)
+        if (!primeNumbers.contains(number)) {
+            primeNumbers.add(number)
+            notifyItemInserted(primeNumbers.size)
+        }
+    }
+
+    companion object {
+        var primeNumbers = mutableListOf<Int>()
     }
 }

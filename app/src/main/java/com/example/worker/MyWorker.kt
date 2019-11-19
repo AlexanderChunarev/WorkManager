@@ -14,7 +14,7 @@ class MyWorker(context: Context, workerParams: WorkerParameters) : Worker(contex
         while (!this.isStopped && currentPosition < Short.MAX_VALUE) {
             if (isPrime(currentPosition)) {
                 setProgressAsync(Data.Builder().putInt(PROGRESS, currentPosition).build())
-                TimeUnit.MILLISECONDS.sleep(100)
+                TimeUnit.MILLISECONDS.sleep(150)
             }
             currentPosition++
         }

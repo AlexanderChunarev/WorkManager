@@ -7,10 +7,10 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.work.*
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.Serializable
 import androidx.work.WorkManager
 import androidx.work.OneTimeWorkRequest
 import androidx.lifecycle.Observer
+import com.example.worker.DataAdapter.Companion.primeNumbers
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,15 +20,15 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
 
         if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(SAVED_LAYOUT_STATE)) {
-                primeNumbers =
-                    savedInstanceState.getSerializable(SAVED_LAYOUT_STATE) as MutableList<Int>
+            if (savedInstanceState.containsKey(ADAPTER_STATE)) {
+                list_of_primes.layoutManager?.onRestoreInstanceState(
+                    savedInstanceState.getParcelable(
+                        ADAPTER_STATE
+                    )
+                )
             }
-            if (savedInstanceState.containsKey(CURRENT_POSITION)) {
-                currPosition = savedInstanceState.getInt(CURRENT_POSITION)
-            }
-            if (savedInstanceState.containsKey(RUNNING_STATE) && savedInstanceState.getBoolean(
-                    RUNNING_STATE)) {
+            if (savedInstanceState.containsKey(RUNNING_STATE)
+                && savedInstanceState.getBoolean(RUNNING_STATE)) {
                 perform()
             }
         }
@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         WorkManager.getInstance(this).enqueue(request!!)
         WorkManager.getInstance(this).getWorkInfoByIdLiveData(request!!.id).observe(this, Observer {
             it?.progress?.getInt(PROGRESS, DEFAULT_VALUE)?.apply {
-                if (this != DEFAULT_VALUE && !primeNumbers.contains(this)) {
+                if (this != DEFAULT_VALUE) {
                     adapter.addItem(this)
                 }
             }
@@ -51,6 +51,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createInputData(): Data {
+        if (primeNumbers.isNotEmpty()) {
+            currPosition = primeNumbers[primeNumbers.lastIndex] + 1
+        }
         return Data.Builder()
             .putInt(CURRENT_POSITION, currPosition)
             .build()
@@ -59,10 +62,7 @@ class MainActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(RUNNING_STATE, isRunning)
-        if (primeNumbers.isNotEmpty()) {
-            outState.putInt(CURRENT_POSITION, primeNumbers[primeNumbers.lastIndex])
-            outState.putSerializable(SAVED_LAYOUT_STATE, primeNumbers as Serializable)
-        }
+        outState.putParcelable(ADAPTER_STATE, list_of_primes.layoutManager?.onSaveInstanceState())
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -75,9 +75,6 @@ class MainActivity : AppCompatActivity() {
             R.id.play_btn -> {
                 if (!isExecuting()) {
                     isRunning = true
-                    if (primeNumbers.isNotEmpty()) {
-                        currPosition = primeNumbers[primeNumbers.lastIndex] + 1
-                    }
                     perform()
                 } else {
                     Toast.makeText(this, "Task is ${getState()}", Toast.LENGTH_SHORT).show()
@@ -112,14 +109,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
+        const val ADAPTER_STATE = "adapterState"
         const val RUNNING_STATE = "taskIsRunning"
         const val CURRENT_POSITION = "current_position"
-        const val SAVED_LAYOUT_STATE = "save_layout_state"
         const val PROGRESS = "getPrimeNumber"
         const val DEFAULT_VALUE = 99
-        private var primeNumbers = mutableListOf<Int>()
         private var currPosition: Int = 2
-        private val adapter by lazy { DataAdapter(primeNumbers) }
+        private val adapter by lazy { DataAdapter() }
         private var request: OneTimeWorkRequest? = null
         private var isRunning = false
     }
